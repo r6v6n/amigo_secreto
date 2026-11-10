@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Amigo secreto</title>
+<style>
+:root{--bg:#f6f3fb;--fg:#1f1b2e;--card:#fff;--ac:#6d28d9;--acfg:#fff;--mu:#6b6480;--bd:#e3dcf2;--sh:0 1px 2px rgba(60,30,120,.06),0 4px 14px rgba(60,30,120,.07)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17131f;--fg:#f1ecfa;--card:#221c2e;--ac:#a78bfa;--acfg:#1a1226;--mu:#a79fba;--bd:#3a3150;--sh:none}}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:480px;margin:0 auto;padding:32px 16px 56px;border-top:4px solid var(--ac)}
+h1{font-size:28px;line-height:1.2;margin:0 0 6px;letter-spacing:-.02em;color:var(--ac)}p.s{color:var(--mu);margin:0 0 22px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:var(--sh)}
+button,textarea,input{font:inherit;color:inherit}
+.btn{display:block;width:100%;padding:14px;margin:8px 0;border-radius:12px;border:1px solid var(--bd);background:var(--card);cursor:pointer;font-weight:600;box-shadow:var(--sh);transition:transform .08s,border-color .15s}.btn:hover{border-color:var(--ac)}.btn:active{transform:scale(.98)}
+.btn.p{background:var(--ac);color:var(--acfg);border-color:var(--ac)}
+textarea,input{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--bd);background:var(--bg)}textarea:focus,input:focus{outline:2px solid var(--ac);outline-offset:1px;border-color:transparent}
+input.pin{font-size:32px;text-align:center;letter-spacing:12px}
+label{font-weight:600;display:block;margin:10px 0 4px}
+.big{font-size:34px;font-weight:700;text-align:center;color:var(--ac);margin:12px 0}
+.err{color:#dc2626;text-align:center;min-height:1.4em}
+.tabs{display:flex;gap:8px;margin-bottom:18px}.tabs .btn{margin:0;padding:10px}
+table{width:100%;border-collapse:collapse}td{padding:4px 0;border-bottom:1px solid var(--bd)}td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+</style></head>
+<body><main><div id="tabs"></div><div id="app"></div></main>
+<script>
+const app=document.getElementById('app'),tabsEl=document.getElementById('tabs');
+const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function info(d){
+  const e=d.e||{};
+  const f=e.d?new Date(e.d+'T00:00').toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
+  const rows=[f&&'<b>Fecha</b> · '+esc(f),e.m&&'<b>Monto</b> · '+esc(e.m)].filter(Boolean);
+  return rows.length?'<div class="card">'+rows.join('<br>')+'</div>':'';
+}
+const enc=new TextEncoder(),dec=new TextDecoder();
+const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
+const ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+const url64=s=>b64(enc.encode(s)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const from64=s=>dec.decode(ub(s.replace(/-/g,'+').replace(/_/g,'/')));
+async function key(pin,salt){
+  const m=await crypto.subtle.importKey('raw',enc.encode(pin),'PBKDF2',false,['deriveKey']);
+  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:150000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function seal(pin,text){
+  const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
+  const c=await crypto.subtle.encrypt({name:'AES-GCM',iv},await key(pin,salt),enc.encode(text));
+  return{n:'',s:b64(salt),i:b64(iv),c:b64(c)};
+}
+async function unseal(pin,e){return dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(e.i)},await key(pin,ub(e.s)),ub(e.c)));}
+
+let DATA=null,DRAWN=null;
+try{const q=new URLSearchParams(location.search).get('d');if(q)DATA=JSON.parse(from64(q));}catch(_){}
+
+/* ---------- Participantes ---------- */
+function viewList(d){
+  const t=(d.e&&d.e.t)?esc(d.e.t):'Amigo secreto';
+  app.innerHTML=`<h1>${t}</h1><p class="s">Toca tu nombre para ver a quién te tocó.</p>${info(d)}`;
+  d.p.forEach(e=>{const b=document.createElement('button');b.className='btn';b.textContent=cap(e.n);b.onclick=()=>viewPin(e,d);app.appendChild(b);});
+}
+function viewPin(e,d){
+  app.innerHTML=`<h1>Hola, ${esc(cap(e.n))}</h1><p class="s">Escribe tu clave de 4 dígitos.</p>
+  <div class="card"><input class="pin" id="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off"><div class="err" id="err"></div></div>
+  <button class="btn p" id="go">Ver mi amigo secreto</button><button class="btn" id="back">Volver</button>`;
+  const go=async()=>{
+    const pin=document.getElementById('pin').value,err=document.getElementById('err');
+    if(!/^\d{4}$/.test(pin)){err.textContent='La clave tiene 4 dígitos.';return;}
+    err.textContent='Verificando…';
+    try{viewResult(e.n,await unseal(pin,e),d);}catch(_){err.textContent='Clave incorrecta.';}
+  };
+  document.getElementById('go').onclick=go;
+  document.getElementById('pin').onkeydown=k=>{if(k.key==='Enter')go();};
+  document.getElementById('back').onclick=()=>viewList(d);
+}
+function viewResult(n,r,d){
+  app.innerHTML=`<h1>${esc(cap(n))}, tu amigo secreto es…</h1><div class="card"><div class="big">${esc(cap(r))}</div></div>${info(d)}
+  <p class="s">Guarda el secreto. Al cerrar esta pantalla tendrás que volver a ingresar tu clave.</p><button class="btn" id="back">Cerrar</button>`;
+  document.getElementById('back').onclick=()=>viewList(d);
+}
+
+/* ---------- Organizador ---------- */
+function setup(){
+  app.innerHTML=`<h1>Organizador</h1><p class="s">El sorteo se hace en tu navegador y queda cifrado: nadie ve quién le tocó a quién.</p>
+  <div class="card"><label for="et">Nombre del evento (opcional)</label>
+  <input id="et" maxlength="60" placeholder="Intercambio de Navidad">
+  <label for="ed">Fecha (opcional)</label><input id="ed" type="date">
+  <label for="em">Monto del regalo (opcional)</label>
+  <input id="em" maxlength="40" placeholder="$20 USD">
+  <label for="nm">Participantes (uno por línea)</label>
+  <textarea id="nm" rows="6">miguel\nisa\nrafa\njuancho\nbeto</textarea>
+  <label for="rs">Restricciones (quien: no puede darle a…)</label>
+  <textarea id="rs" rows="6">isa: beto, juancho\njuancho: isa\nbeto: miguel\nrafa: juancho\nmiguel: rafa</textarea>
+  <div class="err" id="err"></div></div>
+  <button class="btn p" id="go">Sortear</button><div id="out"></div>`;
+  document.getElementById('go').onclick=run;
+}
+function draw(people,ban){
+  for(let t=0;t<20000;t++){
+    const r=people.slice();
+    for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}
+    if(people.every((d,i)=>d!==r[i]&&!(ban[d]||[]).includes(r[i])))return Object.fromEntries(people.map((d,i)=>[d,r[i]]));
+  }
+  return null;
+}
+async function run(){
+  const err=document.getElementById('err');err.textContent='';
+  const people=[...new Set(document.getElementById('nm').value.split('\n').map(s=>s.trim().toLowerCase()).filter(Boolean))];
+  if(people.length<3){err.textContent='Se necesitan al menos 3 participantes.';return;}
+  const ban={};
+  for(const line of document.getElementById('rs').value.split('\n')){
+    if(!line.trim())continue;
+    const [a,b]=line.split(':');
+    const d=(a||'').trim().toLowerCase(),xs=(b||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
+    const bad=[d,...xs].find(n=>!people.includes(n));
+    if(bad){err.textContent=`"${bad}" no está en la lista de participantes.`;return;}
+    ban[d]=[...(ban[d]||[]),...xs];
+  }
+  const res=draw(people,ban);
+  if(!res){err.textContent='No hay combinación posible con esas restricciones.';return;}
+  const used=new Set(),pins={};
+  people.forEach(n=>{let p;do{p=String(Math.floor(Math.random()*10000)).padStart(4,'0');}while(used.has(p));used.add(p);pins[n]=p;});
+  const p=[];
+  for(const n of people){const e=await seal(pins[n],res[n]);e.n=n;p.push(e);}
+  const e={};
+  const t=document.getElementById('et').value.trim(),dd=document.getElementById('ed').value,m=document.getElementById('em').value.trim();
+  if(t)e.t=t;if(dd)e.d=dd;if(m)e.m=m;
+  DRAWN=Object.keys(e).length?{e,p}:{p};
+  const link=location.href.split(/[?#]/)[0]+'?d='+url64(JSON.stringify(DRAWN));
+  document.getElementById('out').innerHTML=`<div class="card"><b>Claves: anótalas ahora, no se pueden recuperar</b>
+  <table>${people.map(n=>`<tr><td>${cap(n)}</td><td>${pins[n]}</td></tr>`).join('')}</table></div>
+  <div class="card"><b>Link para tus amigos</b><p class="s">Mándales este link y a cada uno su clave en privado. Funciona en la dirección donde tengas publicada la página.</p>
+  <textarea id="lk" rows="4" readonly></textarea><button class="btn" id="cp">Copiar link</button></div>`;
+  const ta=document.getElementById('lk');ta.value=link;
+  document.getElementById('cp').onclick=async()=>{try{await navigator.clipboard.writeText(link);}catch(_){ta.select();document.execCommand('copy');}document.getElementById('cp').textContent='¡Copiado!';};
+}
+
+/* ---------- Pestañas ---------- */
+function tab(which){
+  tabsEl.innerHTML=`<div class="tabs"><button class="btn ${which==='o'?'p':''}" id="t1">Organizador</button><button class="btn ${which==='p'?'p':''}" id="t2">Participantes</button></div>`;
+  document.getElementById('t1').onclick=()=>{tab('o');setup();};
+  document.getElementById('t2').onclick=()=>{tab('p');DRAWN?viewList(DRAWN):app.innerHTML='<p class="s">Primero haz el sorteo en la pestaña Organizador. Tus amigos solo verán esta sección al abrir tu link.</p>';};
+}
+if(DATA&&DATA.p)viewList(DATA);else{tab('o');setup();}
+</script></body></html>
