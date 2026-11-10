@@ -1,41 +1,55 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="dark">
 <title>Amigo secreto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f6f3fb;--fg:#1f1b2e;--card:#fff;--ac:#6d28d9;--acfg:#fff;--mu:#6b6480;--bd:#e3dcf2;--sh:0 1px 2px rgba(60,30,120,.06),0 4px 14px rgba(60,30,120,.07)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17131f;--fg:#f1ecfa;--card:#221c2e;--ac:#a78bfa;--acfg:#1a1226;--mu:#a79fba;--bd:#3a3150;--sh:none}}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:480px;margin:0 auto;padding:32px 16px 56px;border-top:4px solid var(--ac)}
-h1{font-size:28px;line-height:1.2;margin:0 0 6px;letter-spacing:-.02em;color:var(--ac)}p.s{color:var(--mu);margin:0 0 22px}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:var(--sh)}
+:root{color-scheme:dark;--bg:#0a0a0b;--fg:#e8e4e4;--card:rgba(14,13,14,.88);--ac:#c8415f;--ac2:#7a1230;--mu:#9b9496;--bd:#3a3436;--err:#fb7185;
+--disp:'UnifrakturMaguntia','Pirata One',Georgia,'Times New Roman',serif;--head:'Cinzel',Georgia,'Times New Roman',serif;--body:'Cormorant Garamond','EB Garamond',Georgia,'Times New Roman',serif}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--fg);font:500 19px/1.5 var(--body);background:var(--bg)}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(rgba(6,6,7,.55),rgba(6,6,7,.8)),url(fondo.jpg) center top/cover no-repeat,var(--bg)}
+main{max-width:480px;margin:0 auto;padding:40px 18px 64px}
+h1{font:400 36px/1.15 var(--disp);letter-spacing:.01em;text-align:center;color:var(--ac);margin:0;text-shadow:0 0 22px rgba(200,50,90,.5),0 2px 10px #000}
+.orn{height:1px;margin:18px 0 26px;background:linear-gradient(90deg,transparent,var(--ac2),transparent);position:relative}
+.orn::after{content:"";position:absolute;left:50%;top:-4px;width:8px;height:8px;background:var(--bg);border:1px solid var(--ac);transform:translateX(-50%) rotate(45deg)}
+p.s{color:#c9c3c4;margin:0 0 20px;text-align:center;font-style:italic;text-shadow:0 1px 8px #000,0 0 3px #000}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:2px;padding:20px;margin-bottom:18px;
+outline:1px solid #3a3436;outline-offset:-5px;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);box-shadow:0 12px 30px rgba(0,0,0,.6)}
 button,textarea,input{font:inherit;color:inherit}
-.btn{display:block;width:100%;padding:14px;margin:8px 0;border-radius:12px;border:1px solid var(--bd);background:var(--card);cursor:pointer;font-weight:600;box-shadow:var(--sh);transition:transform .08s,border-color .15s}.btn:hover{border-color:var(--ac)}.btn:active{transform:scale(.98)}
-.btn.p{background:var(--ac);color:var(--acfg);border-color:var(--ac)}
-textarea,input{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--bd);background:var(--bg)}textarea:focus,input:focus{outline:2px solid var(--ac);outline-offset:1px;border-color:transparent}
-input.pin{font-size:32px;text-align:center;letter-spacing:12px}
-label{font-weight:600;display:block;margin:10px 0 4px}
-.big{font-size:34px;font-weight:700;text-align:center;color:var(--ac);margin:12px 0}
-.err{color:#dc2626;text-align:center;min-height:1.4em}
-.tabs{display:flex;gap:8px;margin-bottom:18px}.tabs .btn{margin:0;padding:10px}
-table{width:100%;border-collapse:collapse}td{padding:4px 0;border-bottom:1px solid var(--bd)}td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.btn{display:block;width:100%;padding:13px;margin:10px 0;border-radius:2px;border:1px solid var(--bd);background:rgba(24,22,23,.92);cursor:pointer;
+font:700 13px var(--head);letter-spacing:.14em;text-transform:uppercase;color:var(--fg);transition:border-color .15s,box-shadow .15s}
+.btn:hover{border-color:var(--ac);box-shadow:0 0 14px rgba(180,40,80,.28)}
+.btn.p{background:linear-gradient(#8a1a3a,#5a0f24);border-color:#a8284b;color:#fbe9ee;box-shadow:0 0 16px rgba(150,25,60,.4)}
+textarea,input{width:100%;padding:10px 12px;border-radius:2px;border:1px solid var(--bd);background:#0d0c0d;font-size:18px}
+textarea:focus,input:focus{outline:1px solid var(--ac);border-color:var(--ac)}
+input.pin{font-size:32px;text-align:center;letter-spacing:14px}
+label{display:block;margin:14px 0 5px;font:700 12px var(--head);letter-spacing:.14em;text-transform:uppercase;color:var(--mu)}
+.big{font:400 44px/1.15 var(--disp);text-align:center;color:var(--ac);margin:14px 0;text-shadow:0 0 24px rgba(200,50,90,.55);word-break:break-word}
+.err{color:var(--err);text-align:center;min-height:1.5em;margin-top:8px}
+.tabs{display:flex;gap:8px;margin-bottom:22px}.tabs .btn{margin:0;padding:10px}
+table{width:100%;border-collapse:collapse}td{padding:5px 0;border-bottom:1px solid var(--bd)}td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.1em}
+.lk{word-break:break-all;color:var(--ac);margin:6px 0}
+details{margin-top:6px;color:var(--mu)}summary{cursor:pointer}
+b.k{font:700 12px var(--head);letter-spacing:.14em;text-transform:uppercase;color:var(--mu)}
 </style></head>
-<body><main><div id="tabs"></div><div id="app"></div></main>
+<body><main><div id="tabs"></div><div id="app"><p class="s">Cargando…</p></div></main>
 <script>
 const app=document.getElementById('app'),tabsEl=document.getElementById('tabs');
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const head=(t)=>`<h1>${t}</h1><div class="orn"></div>`;
 function info(d){
   const e=d.e||{};
   const f=e.d?new Date(e.d+'T00:00').toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
-  const rows=[f&&'<b>Fecha</b> · '+esc(f),e.m&&'<b>Monto</b> · '+esc(e.m)].filter(Boolean);
+  const rows=[f&&'<b class="k">Fecha</b> · '+esc(f),e.m&&'<b class="k">Monto</b> · '+esc(e.m)].filter(Boolean);
   return rows.length?'<div class="card">'+rows.join('<br>')+'</div>':'';
 }
 const enc=new TextEncoder(),dec=new TextDecoder();
 const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
 const ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-const url64=s=>b64(enc.encode(s)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-const from64=s=>dec.decode(ub(s.replace(/-/g,'+').replace(/_/g,'/')));
 async function key(pin,salt){
   const m=await crypto.subtle.importKey('raw',enc.encode(pin),'PBKDF2',false,['deriveKey']);
   return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:150000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
@@ -48,16 +62,16 @@ async function seal(pin,text){
 async function unseal(pin,e){return dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(e.i)},await key(pin,ub(e.s)),ub(e.c)));}
 
 let DATA=null,DRAWN=null;
-try{const q=new URLSearchParams(location.search).get('d');if(q)DATA=JSON.parse(from64(q));}catch(_){}
+const ORG=new URLSearchParams(location.search).has('organizador');
 
 /* ---------- Participantes ---------- */
 function viewList(d){
   const t=(d.e&&d.e.t)?esc(d.e.t):'Amigo secreto';
-  app.innerHTML=`<h1>${t}</h1><p class="s">Toca tu nombre para ver a quién te tocó.</p>${info(d)}`;
+  app.innerHTML=head(t)+`<p class="s">Toca tu nombre para ver a quién te tocó.</p>${info(d)}`;
   d.p.forEach(e=>{const b=document.createElement('button');b.className='btn';b.textContent=cap(e.n);b.onclick=()=>viewPin(e,d);app.appendChild(b);});
 }
 function viewPin(e,d){
-  app.innerHTML=`<h1>Hola, ${esc(cap(e.n))}</h1><p class="s">Escribe tu clave de 4 dígitos.</p>
+  app.innerHTML=head('Hola, '+esc(cap(e.n)))+`<p class="s">Escribe tu clave de 4 dígitos.</p>
   <div class="card"><input class="pin" id="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off"><div class="err" id="err"></div></div>
   <button class="btn p" id="go">Ver mi amigo secreto</button><button class="btn" id="back">Volver</button>`;
   const go=async()=>{
@@ -71,14 +85,15 @@ function viewPin(e,d){
   document.getElementById('back').onclick=()=>viewList(d);
 }
 function viewResult(n,r,d){
-  app.innerHTML=`<h1>${esc(cap(n))}, tu amigo secreto es…</h1><div class="card"><div class="big">${esc(cap(r))}</div></div>${info(d)}
+  app.innerHTML=head(esc(cap(n))+', tu amigo secreto es')+`<div class="card"><div class="big">${esc(cap(r))}</div></div>${info(d)}
   <p class="s">Guarda el secreto. Al cerrar esta pantalla tendrás que volver a ingresar tu clave.</p><button class="btn" id="back">Cerrar</button>`;
   document.getElementById('back').onclick=()=>viewList(d);
 }
 
 /* ---------- Organizador ---------- */
 function setup(){
-  app.innerHTML=`<h1>Organizador</h1><p class="s">El sorteo se hace en tu navegador y queda cifrado: nadie ve quién le tocó a quién.</p>
+  const aviso=DATA?'<p class="s">Ya hay un sorteo publicado en esta página. Si subes uno nuevo, lo reemplazas.</p>':'<p class="s">El sorteo se hace en tu navegador y queda cifrado: nadie ve quién le tocó a quién.</p>';
+  app.innerHTML=head('Organizador')+aviso+`
   <div class="card"><label for="et">Nombre del evento (opcional)</label>
   <input id="et" maxlength="60" placeholder="Intercambio de Navidad">
   <label for="ed">Fecha (opcional)</label><input id="ed" type="date">
@@ -99,6 +114,10 @@ function draw(people,ban){
     if(people.every((d,i)=>d!==r[i]&&!(ban[d]||[]).includes(r[i])))return Object.fromEntries(people.map((d,i)=>[d,r[i]]));
   }
   return null;
+}
+async function copy(text,btn,ta){
+  try{await navigator.clipboard.writeText(text);}catch(_){ta.select();document.execCommand('copy');}
+  btn.textContent='Copiado';
 }
 async function run(){
   const err=document.getElementById('err');err.textContent='';
@@ -123,20 +142,47 @@ async function run(){
   const t=document.getElementById('et').value.trim(),dd=document.getElementById('ed').value,m=document.getElementById('em').value.trim();
   if(t)e.t=t;if(dd)e.d=dd;if(m)e.m=m;
   DRAWN=Object.keys(e).length?{e,p}:{p};
-  const link=location.href.split(/[?#]/)[0]+'?d='+url64(JSON.stringify(DRAWN));
-  document.getElementById('out').innerHTML=`<div class="card"><b>Claves: anótalas ahora, no se pueden recuperar</b>
-  <table>${people.map(n=>`<tr><td>${cap(n)}</td><td>${pins[n]}</td></tr>`).join('')}</table></div>
-  <div class="card"><b>Link para tus amigos</b><p class="s">Mándales este link y a cada uno su clave en privado. Funciona en la dirección donde tengas publicada la página.</p>
-  <textarea id="lk" rows="4" readonly></textarea><button class="btn" id="cp">Copiar link</button></div>`;
-  const ta=document.getElementById('lk');ta.value=link;
-  document.getElementById('cp').onclick=async()=>{try{await navigator.clipboard.writeText(link);}catch(_){ta.select();document.execCommand('copy');}document.getElementById('cp').textContent='¡Copiado!';};
+  const json=JSON.stringify(DRAWN);
+  const base=location.href.split(/[?#]/)[0];
+  const link=location.protocol==='file:'?'(publica primero la página para tener su link)':base;
+  document.getElementById('out').innerHTML=`<div class="card"><b class="k">Claves: anótalas ahora, no se pueden recuperar</b>
+  <table>${people.map(n=>`<tr><td>${esc(cap(n))}</td><td>${pins[n]}</td></tr>`).join('')}</table></div>
+  <div class="card"><b class="k">Publicar el sorteo</b>
+  <p class="s" style="text-align:left;margin:8px 0">1. Descarga el archivo. 2. Súbelo a tu repositorio de GitHub con el nombre exacto <b>datos.json</b> (reemplaza el anterior si existe). 3. Espera uno o dos minutos.</p>
+  <button class="btn p" id="dl">Descargar datos.json</button>
+  <details><summary>Si la descarga no funciona, copia el contenido</summary>
+  <textarea id="jt" rows="4" readonly></textarea><button class="btn" id="cj">Copiar contenido</button></details></div>
+  <div class="card"><b class="k">Link para tus amigos</b><div class="lk" id="lt"></div>
+  <button class="btn" id="cl">Copiar link</button></div>`;
+  document.getElementById('lt').textContent=link;
+  const jt=document.getElementById('jt');jt.value=json;
+  document.getElementById('dl').onclick=()=>{
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));a.download='datos.json';
+    document.body.appendChild(a);a.click();a.remove();
+  };
+  document.getElementById('cj').onclick=ev=>copy(json,ev.target,jt);
+  const tmp=document.createElement('textarea');tmp.value=base;tmp.setAttribute('aria-hidden','true');tmp.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0';document.body.appendChild(tmp);
+  document.getElementById('cl').onclick=ev=>copy(base,ev.target,tmp);
 }
 
-/* ---------- Pestañas ---------- */
+/* ---------- Pestañas (solo organizador) ---------- */
 function tab(which){
-  tabsEl.innerHTML=`<div class="tabs"><button class="btn ${which==='o'?'p':''}" id="t1">Organizador</button><button class="btn ${which==='p'?'p':''}" id="t2">Participantes</button></div>`;
+  tabsEl.innerHTML=`<div class="tabs"><button class="btn ${which==='o'?'p':''}" id="t1">Organizador</button><button class="btn ${which==='p'?'p':''}" id="t2">Vista previa</button></div>`;
   document.getElementById('t1').onclick=()=>{tab('o');setup();};
-  document.getElementById('t2').onclick=()=>{tab('p');DRAWN?viewList(DRAWN):app.innerHTML='<p class="s">Primero haz el sorteo en la pestaña Organizador. Tus amigos solo verán esta sección al abrir tu link.</p>';};
+  document.getElementById('t2').onclick=()=>{
+    tab('p');
+    const d=DRAWN||DATA;
+    d?viewList(d):app.innerHTML='<p class="s">Primero haz el sorteo en la pestaña Organizador.</p>';
+  };
 }
-if(DATA&&DATA.p)viewList(DATA);else{tab('o');setup();}
+
+/* ---------- Inicio ---------- */
+(async()=>{
+  try{
+    const r=await fetch('datos.json?v='+Date.now(),{cache:'no-store'});
+    if(r.ok){const j=await r.json();if(j&&Array.isArray(j.p)&&j.p.length)DATA=j;}
+  }catch(_){}
+  if(DATA&&!ORG)viewList(DATA);else{tab('o');setup();}
+})();
 </script></body></html>
