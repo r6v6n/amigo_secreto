@@ -42,8 +42,9 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .tabs button{flex:1;min-width:120px}
 .tabs button.active{background:#84203d;border-color:#a94a62}
-.notice{padding:12px 14px;border-left:3px solid var(--gold);background:#211a1b;color:#e3d6d5;margin:12px 0;font-size:16px}
-.notice.error{border-color:var(--danger)}.notice.success{border-color:var(--ok)}
+.notice{padding:12px 14px;border-left:3px solid #84203d;background:#211a1b;color:#e3d6d5;margin:12px 0;font-size:16px}
+.notice.error{border-color:var(--danger)}.notice.success{border-color:#84203d}
+.budget-line{margin-top:7px;color:#e3d6d5;font-size:15px}
 .item,.person,.exchange,.assignment{border:1px solid #393034;background:#100d10;padding:12px;margin:9px 0;border-radius:3px}
 .item-title{font-size:21px;color:#f0dfe2}
 .item a{color:#df8296;overflow-wrap:anywhere}
@@ -112,19 +113,37 @@ a{color:#e08ba0}
   </div>
 </section>
 
+
 <section id="participantApp" class="hidden">
   <div class="card">
-    <div class="row"><div><h2 id="participantWelcome">Tu intercambio</h2><div class="muted small" id="participantEvent"></div></div><button class="secondary" onclick="signOut()">Salir</button></div>
+    <div class="row">
+      <div>
+        <h2 id="participantWelcome">Tu intercambio</h2>
+        <div class="muted small" id="participantEvent"></div>
+      </div>
+      <button class="secondary" onclick="signOut()">Salir</button>
+    </div>
+
     <div id="recipientPanel" class="notice hidden"></div>
-    <h3>Mi lista de deseos</h3>
-    <label>Notas para quien te regala</label><textarea id="myNotes" placeholder="Tallas, colores favoritos, ideas generales..."></textarea>
-    <div id="myItems"></div>
-    <div class="actions"><button class="secondary" onclick="addWishlistItem()">Añadir artículo</button><button onclick="saveWishlist()">Guardar mi lista</button></div>
-    <hr>
+
     <h3>Lista de deseos de mi amigo secreto</h3>
     <div id="recipientWishlist" class="muted">Cargando...</div>
+
+    <hr>
+
+    <h3>Mi lista de deseos</h3>
+    <label>Notas para quien te regala</label>
+    <textarea id="myNotes" placeholder="Tallas, colores favoritos, ideas generales..."></textarea>
+
+    <div id="myItems"></div>
+
+    <div class="actions">
+      <button class="secondary" onclick="addWishlistItem()">Añadir artículo</button>
+      <button onclick="saveWishlist()">Guardar mi lista</button>
+    </div>
   </div>
 </section>
+
 <footer>marico el que lo lea</footer>
 </main>
 <div id="toast"></div>
@@ -143,12 +162,14 @@ function money(v,c="USD"){if(v===null||v===undefined||v==="")return "Sin presupu
 async function invoke(name,body={}){const {data,error}=await sb.functions.invoke(name,{body});if(error){let detail=error.message||"Error de conexión";try{const c=error.context;if(c&&typeof c.json==="function"){const j=await c.json();detail=j.error||j.message||detail}}catch{}throw new Error(detail)}if(data?.error)throw new Error(data.error);return data}
 function showMode(mode){$("participantLogin").classList.toggle("hidden",mode!=="participant");$("adminLogin").classList.toggle("hidden",mode!=="admin");$("tabParticipant").classList.toggle("active",mode==="participant");$("tabAdmin").classList.toggle("active",mode==="admin")}
 function showSection(which){$("landing").classList.toggle("hidden",which!=="landing");$("adminApp").classList.toggle("hidden",which!=="admin");$("participantApp").classList.toggle("hidden",which!=="participant")}
+
 function exchangeFromUrl(){
  const id=new URLSearchParams(location.search).get("exchange");
+
  if(id){
   $("exchangeId").value=id;
-  $("exchangeLabel").textContent="Invitación reconocida. Selecciona tu nombre e introduce tu PIN.";
-  $("exchangeLabel").classList.remove("hidden");
+  $("exchangeLabel").textContent="";
+  $("exchangeLabel").classList.add("hidden");
   $("participantFields").classList.remove("hidden");
   loadParticipants();
  }else{
@@ -236,17 +257,44 @@ function getWishlistPayload(d){
  return {root,mine,theirs,recipient};
 }
 
+
 async function loadMyWishlists(){
- const d=await invoke("get-my-wishlists",{});const x=getWishlistPayload(d);
+ const d=await invoke("get-my-wishlists",{});
+ const x=getWishlistPayload(d);
+
  participantData={...(participantData||{}),...x.root};
- const mine=x.mine||{};$("myNotes").value=mine.notes||mine.wishlist?.notes||"";
+
+ const mine=x.mine||{};
+ $("myNotes").value=mine.notes||mine.wishlist?.notes||"";
  renderMyItems(mine.items||mine.wishlist_items||[]);
- const recipientName=x.recipient?.name||x.recipient?.participant_name||"tu amigo secreto";
- $("recipientPanel").textContent=`Te ha tocado: ${recipientName}`;$("recipientPanel").classList.remove("hidden");
- $("participantWelcome").textContent=participantData.participant?.name?`Hola, ${participantData.participant.name}`:"Tu intercambio";
- $("participantEvent").textContent=currentExchange?.name||participantData.exchange?.name||"";
+
+ const recipientName=
+  x.recipient?.name||
+  x.recipient?.participant_name||
+  "tu amigo secreto";
+
+ const ex=currentExchange||participantData.exchange||{};
+ const budgetText=ex.budget!=null
+  ? money(ex.budget,ex.currency)
+  : "No especificado";
+
+ $("recipientPanel").innerHTML=`
+  <div><strong>Te tocó: ${esc(recipientName)}</strong></div>
+  <div class="budget-line">Presupuesto del intercambio: ${esc(budgetText)}</div>
+ `;
+ $("recipientPanel").classList.remove("hidden");
+
+ $("participantWelcome").textContent=
+  participantData.participant?.name
+   ? `Hola, ${participantData.participant.name}`
+   : "Tu intercambio";
+
+ $("participantEvent").textContent=
+  currentExchange?.name||participantData.exchange?.name||"";
+
  renderRecipientWishlist(x.theirs);
 }
+
 function renderMyItems(items){$("myItems").innerHTML=(items||[]).map((it,i)=>itemEditor(it,i)).join("");}
 function itemEditor(it={},i){return `<div class="item wishlist-edit"><label>Artículo ${i+1}</label><input class="it-title" placeholder="Nombre del artículo" value="${esc(it.title||"")}"><input class="it-description" placeholder="Descripción, talla, color..." value="${esc(it.description||"")}"><input class="it-url" placeholder="Enlace (opcional)" value="${esc(it.url||"")}"><div class="actions"><button class="danger" onclick="this.closest('.wishlist-edit').remove()">Quitar</button></div></div>`}
 function addWishlistItem(){const wrap=document.createElement("div");wrap.innerHTML=itemEditor({},$("myItems").children.length);$("myItems").append(wrap.firstElementChild)}
