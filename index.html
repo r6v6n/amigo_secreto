@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#0a0a0b;--panel:rgba(17,15,17,.94);--fg:#e8e4e4;--muted:#aaa0a3;--red:#c8415f;--red2:#7a1230;--line:#3a3436;--gold:#c7a77a;--ok:#9ebd9e;--danger:#e58a8a}
+:root{--bg:#0a0a0b;--panel:rgba(17,15,17,.94);--fg:#e8e4e4;--muted:#aaa0a3;--red:#8f1d3d;--red2:#5b1028;--line:#3a3436;--gold:#c7a77a;--ok:#9ebd9e;--danger:#e58a8a}
 *{box-sizing:border-box}
 body{margin:0;min-height:100vh;background:var(--bg);color:var(--fg);font-family:'Cormorant Garamond',serif;font-size:19px}
 body:before{content:"";position:fixed;inset:0;background:linear-gradient(rgba(5,4,6,.78),rgba(5,4,6,.9)),url("fondo.jpg") center center/cover fixed;z-index:-1}
@@ -30,7 +30,7 @@ label{display:block;color:#d8c9cc;font-family:'Cinzel',serif;font-size:11px;lett
 input,textarea,select{width:100%;padding:11px 12px;color:var(--fg);background:#0b090b;border:1px solid #514348;border-radius:3px;outline:none}
 input:focus,textarea:focus,select:focus{border-color:var(--red)}
 textarea{min-height:85px;resize:vertical}
-button,.btn{border:1px solid var(--red2);background:linear-gradient(135deg,#8d1838,#4b1022);color:#fff;padding:10px 16px;border-radius:3px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;transition:.2s}
+button,.btn{border:1px solid var(--red2);background:#64142d;color:#fff;padding:10px 16px;border-radius:3px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;transition:.2s}
 button:hover{filter:brightness(1.2);border-color:var(--red)}
 button.secondary{background:#171316;border-color:#66545a;color:#e8dadd}
 button.ghost{background:transparent;border-color:#514348;color:#d9c8cd}
@@ -41,7 +41,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .row>*{flex:1;min-width:0}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
 .tabs button{flex:1;min-width:120px}
-.tabs button.active{background:linear-gradient(135deg,#b52d4d,#68142d);border-color:#df6c83}
+.tabs button.active{background:#84203d;border-color:#a94a62}
 .notice{padding:12px 14px;border-left:3px solid var(--gold);background:#211a1b;color:#e3d6d5;margin:12px 0;font-size:16px}
 .notice.error{border-color:var(--danger)}.notice.success{border-color:var(--ok)}
 .item,.person,.exchange,.assignment{border:1px solid #393034;background:#100d10;padding:12px;margin:9px 0;border-radius:3px}
@@ -62,7 +62,6 @@ a{color:#e08ba0}
 <main>
 <header>
   <div class="brand">Amigo Secreto</div>
-  <div class="subtitle">Un intercambio, un secreto, una sorpresa</div>
 </header>
 
 <section id="landing" class="card">
@@ -73,14 +72,15 @@ a{color:#e08ba0}
     <button id="tabAdmin" onclick="showMode('admin')">Organizador</button>
   </div>
   <div id="participantLogin">
-    <label>Intercambio</label>
-    <div id="exchangeLabel" class="notice hidden"></div>
-    <div id="exchangeIdWrap"><input id="exchangeId" placeholder="Código del intercambio"></div>
-    <label>Tu nombre</label>
-    <select id="participantName"><option value="">Primero carga el intercambio</option></select>
-    <label>PIN de 4 dígitos</label>
-    <input id="participantPin" inputmode="numeric" maxlength="4" placeholder="••••">
-    <div class="actions"><button onclick="participantLogin()">Entrar</button><button class="secondary" onclick="loadParticipants()">Cargar participantes</button></div>
+    <div id="exchangeLabel" class="notice">Para participar, abre el enlace de invitación que te compartió el organizador.</div>
+    <input id="exchangeId" type="hidden">
+    <div id="participantFields" class="hidden">
+      <label>Tu nombre</label>
+      <select id="participantName"><option value="">Cargando participantes...</option></select>
+      <label>PIN de 4 dígitos</label>
+      <input id="participantPin" inputmode="numeric" maxlength="4" placeholder="••••">
+      <div class="actions"><button onclick="participantLogin()">Entrar</button></div>
+    </div>
     <div id="participantMsg"></div>
   </div>
   <div id="adminLogin" class="hidden">
@@ -143,9 +143,22 @@ function money(v,c="USD"){if(v===null||v===undefined||v==="")return "Sin presupu
 async function invoke(name,body={}){const {data,error}=await sb.functions.invoke(name,{body});if(error){let detail=error.message||"Error de conexión";try{const c=error.context;if(c&&typeof c.json==="function"){const j=await c.json();detail=j.error||j.message||detail}}catch{}throw new Error(detail)}if(data?.error)throw new Error(data.error);return data}
 function showMode(mode){$("participantLogin").classList.toggle("hidden",mode!=="participant");$("adminLogin").classList.toggle("hidden",mode!=="admin");$("tabParticipant").classList.toggle("active",mode==="participant");$("tabAdmin").classList.toggle("active",mode==="admin")}
 function showSection(which){$("landing").classList.toggle("hidden",which!=="landing");$("adminApp").classList.toggle("hidden",which!=="admin");$("participantApp").classList.toggle("hidden",which!=="participant")}
-function exchangeFromUrl(){const id=new URLSearchParams(location.search).get("exchange");if(id){$("exchangeId").value=id;$("exchangeIdWrap").classList.add("hidden");$("exchangeLabel").textContent="Intercambio identificado desde tu invitación";$("exchangeLabel").classList.remove("hidden");loadParticipants()}}
+function exchangeFromUrl(){
+ const id=new URLSearchParams(location.search).get("exchange");
+ if(id){
+  $("exchangeId").value=id;
+  $("exchangeLabel").textContent="Invitación reconocida. Selecciona tu nombre e introduce tu PIN.";
+  $("exchangeLabel").classList.remove("hidden");
+  $("participantFields").classList.remove("hidden");
+  loadParticipants();
+ }else{
+  $("exchangeLabel").textContent="Para participar, abre el enlace de invitación que te compartió el organizador. No necesitas introducir ningún código.";
+  $("exchangeLabel").classList.remove("hidden");
+  $("participantFields").classList.add("hidden");
+ }
+}
 async function loadParticipants(){
- const id=$("exchangeId").value.trim();if(!id){message("participantMsg","Introduce el código del intercambio.");return}
+ const id=$("exchangeId").value.trim();if(!id){message("participantMsg","Abre el enlace de invitación que te compartió el organizador.");return}
  try{const d=await invoke("list-exchange-participants",{exchange_id:id});currentExchange=d.exchange||d;const list=d.participants||[];$("participantName").innerHTML='<option value="">Selecciona tu nombre</option>'+list.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join("");message("participantMsg",list.length?`Intercambio: ${currentExchange.name||"Amigo secreto"} · ${list.length} participantes`:"Todavía no hay participantes.","success")}
  catch(e){message("participantMsg",e.message,"error")}
 }
