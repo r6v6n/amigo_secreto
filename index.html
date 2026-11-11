@@ -203,19 +203,45 @@ async function participantLogin(){
  const d=await invoke("participant-login",{exchange_id,name,pin});participantData=d;currentExchange=currentExchange||{};await loadMyWishlists();showSection("participant");subscribeRealtime();toast("Sesión iniciada")}
  catch(e){message("participantMsg",e.message,"error")}
 }
+
 function getWishlistPayload(d){
  const root=d?.data||d||{};
- const mine=root.my_wishlist||root.myWishlist||root.own_wishlist||root.ownWishlist||root.wishlist||root.mine||{};
- const theirs=root.recipient_wishlist||root.recipientWishlist||root.assigned_wishlist||root.assignedWishlist||root.target_wishlist||root.theirs||{};
- const recipient=root.recipient||root.assigned_to||root.assignedTo||root.gift_recipient||{};
+
+ const mine=
+  root.my_wishlist||
+  root.myWishlist||
+  root.own_wishlist||
+  root.ownWishlist||
+  root.wishlist||
+  root.mine||
+  {};
+
+ const theirs=
+  root.recipient_wishlist||
+  root.recipientWishlist||
+  root.assigned_wishlist||
+  root.assignedWishlist||
+  root.target_wishlist||
+  root.theirs||
+  {};
+
+ const recipient=
+  root.recipient||
+  root.assigned_person||
+  root.assigned_to||
+  root.assignedTo||
+  root.gift_recipient||
+  {};
+
  return {root,mine,theirs,recipient};
 }
+
 async function loadMyWishlists(){
  const d=await invoke("get-my-wishlists",{});const x=getWishlistPayload(d);
  participantData={...(participantData||{}),...x.root};
  const mine=x.mine||{};$("myNotes").value=mine.notes||mine.wishlist?.notes||"";
  renderMyItems(mine.items||mine.wishlist_items||[]);
- const recipientName=x.recipient.name||x.recipient.participant_name||x.theirs.participant_name||x.theirs.name||"tu amigo secreto";
+ const recipientName=x.recipient?.name||x.recipient?.participant_name||"tu amigo secreto";
  $("recipientPanel").textContent=`Te ha tocado: ${recipientName}`;$("recipientPanel").classList.remove("hidden");
  $("participantWelcome").textContent=participantData.participant?.name?`Hola, ${participantData.participant.name}`:"Tu intercambio";
  $("participantEvent").textContent=currentExchange?.name||participantData.exchange?.name||"";
