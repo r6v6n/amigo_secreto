@@ -1,188 +1,246 @@
-<!doctype html>
-<html lang="es"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="color-scheme" content="dark">
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0b">
 <title>Amigo secreto</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Cinzel:wght@500;700&family=Cormorant+Garamond:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700&family=Cormorant+Garamond:wght@400;500;600;700&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{color-scheme:dark;--bg:#0a0a0b;--fg:#e8e4e4;--card:rgba(14,13,14,.88);--ac:#c8415f;--ac2:#7a1230;--mu:#9b9496;--bd:#3a3436;--err:#fb7185;
---disp:'UnifrakturMaguntia','Pirata One',Georgia,'Times New Roman',serif;--head:'Cinzel',Georgia,'Times New Roman',serif;--body:'Cormorant Garamond','EB Garamond',Georgia,'Times New Roman',serif}
+:root{--bg:#0a0a0b;--panel:rgba(17,15,17,.94);--fg:#e8e4e4;--muted:#aaa0a3;--red:#c8415f;--red2:#7a1230;--line:#3a3436;--gold:#c7a77a;--ok:#9ebd9e;--danger:#e58a8a}
 *{box-sizing:border-box}
-body{margin:0;min-height:100vh;color:var(--fg);font:500 19px/1.5 var(--body);background:var(--bg)}
-body::before{content:"";position:fixed;inset:0;z-index:-1;background:linear-gradient(rgba(6,6,7,.55),rgba(6,6,7,.8)),url(fondo.jpg) center top/cover no-repeat,var(--bg)}
-main{max-width:480px;margin:0 auto;padding:40px 18px 64px}
-h1{font:400 36px/1.15 var(--disp);letter-spacing:.01em;text-align:center;color:var(--ac);margin:0;text-shadow:0 0 22px rgba(200,50,90,.5),0 2px 10px #000}
-.orn{height:1px;margin:18px 0 26px;background:linear-gradient(90deg,transparent,var(--ac2),transparent);position:relative}
-.orn::after{content:"";position:absolute;left:50%;top:-4px;width:8px;height:8px;background:var(--bg);border:1px solid var(--ac);transform:translateX(-50%) rotate(45deg)}
-p.s{color:#c9c3c4;margin:0 0 20px;text-align:center;font-style:italic;text-shadow:0 1px 8px #000,0 0 3px #000}
-.card{background:var(--card);border:1px solid var(--bd);border-radius:2px;padding:20px;margin-bottom:18px;
-outline:1px solid #3a3436;outline-offset:-5px;backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);box-shadow:0 12px 30px rgba(0,0,0,.6)}
-button,textarea,input{font:inherit;color:inherit}
-.btn{display:block;width:100%;padding:13px;margin:10px 0;border-radius:2px;border:1px solid var(--bd);background:rgba(24,22,23,.92);cursor:pointer;
-font:700 13px var(--head);letter-spacing:.14em;text-transform:uppercase;color:var(--fg);transition:border-color .15s,box-shadow .15s}
-.btn:hover{border-color:var(--ac);box-shadow:0 0 14px rgba(180,40,80,.28)}
-.btn.p{background:linear-gradient(#8a1a3a,#5a0f24);border-color:#a8284b;color:#fbe9ee;box-shadow:0 0 16px rgba(150,25,60,.4)}
-textarea,input{width:100%;padding:10px 12px;border-radius:2px;border:1px solid var(--bd);background:#0d0c0d;font-size:18px}
-textarea:focus,input:focus{outline:1px solid var(--ac);border-color:var(--ac)}
-input.pin{font-size:32px;text-align:center;letter-spacing:14px}
-label{display:block;margin:14px 0 5px;font:700 12px var(--head);letter-spacing:.14em;text-transform:uppercase;color:var(--mu)}
-.big{font:400 44px/1.15 var(--disp);text-align:center;color:var(--ac);margin:14px 0;text-shadow:0 0 24px rgba(200,50,90,.55);word-break:break-word}
-.err{color:var(--err);text-align:center;min-height:1.5em;margin-top:8px}
-.tabs{display:flex;gap:8px;margin-bottom:22px}.tabs .btn{margin:0;padding:10px}
-table{width:100%;border-collapse:collapse}td{padding:5px 0;border-bottom:1px solid var(--bd)}td:last-child{text-align:right;font-variant-numeric:tabular-nums;font-weight:700;letter-spacing:.1em}
-.lk{word-break:break-all;color:var(--ac);margin:6px 0}
-details{margin-top:6px;color:var(--mu)}summary{cursor:pointer}
-b.k{font:700 12px var(--head);letter-spacing:.14em;text-transform:uppercase;color:var(--mu)}
-</style></head>
-<body><main><div id="tabs"></div><div id="app"><p class="s">Cargando…</p></div></main>
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--fg);font-family:'Cormorant Garamond',serif;font-size:19px}
+body:before{content:"";position:fixed;inset:0;background:linear-gradient(rgba(5,4,6,.78),rgba(5,4,6,.9)),url("fondo.jpg") center center/cover fixed;z-index:-1}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+main{width:min(100% - 28px,760px);margin:0 auto;padding:34px 0 70px}
+header{text-align:center;margin-bottom:26px}
+.brand{font-family:'UnifrakturMaguntia',cursive;font-size:clamp(43px,9vw,68px);line-height:1.08;color:var(--red);text-shadow:0 2px 20px #5d1028}
+.subtitle{font-family:'Cinzel',serif;font-size:12px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;margin-top:9px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:22px;margin:16px 0;box-shadow:0 12px 36px #0007;backdrop-filter:blur(5px)}
+h2,h3{font-family:'Cinzel',serif;font-weight:500;letter-spacing:1px;color:#e8d8d8}
+h2{font-size:18px;margin:0 0 17px}
+h3{font-size:15px;margin:20px 0 10px}
+p{line-height:1.4}
+.small,.muted{color:var(--muted);font-size:16px}
+label{display:block;color:#d8c9cc;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1.2px;text-transform:uppercase;margin:13px 0 6px}
+input,textarea,select{width:100%;padding:11px 12px;color:var(--fg);background:#0b090b;border:1px solid #514348;border-radius:3px;outline:none}
+input:focus,textarea:focus,select:focus{border-color:var(--red)}
+textarea{min-height:85px;resize:vertical}
+button,.btn{border:1px solid var(--red2);background:linear-gradient(135deg,#8d1838,#4b1022);color:#fff;padding:10px 16px;border-radius:3px;font-family:'Cinzel',serif;font-size:11px;letter-spacing:1px;text-transform:uppercase;transition:.2s}
+button:hover{filter:brightness(1.2);border-color:var(--red)}
+button.secondary{background:#171316;border-color:#66545a;color:#e8dadd}
+button.ghost{background:transparent;border-color:#514348;color:#d9c8cd}
+button.danger{background:#351014;border-color:#8e3039}
+button:disabled{opacity:.45;cursor:not-allowed}
+.actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:15px}
+.row{display:flex;gap:12px;align-items:end}
+.row>*{flex:1;min-width:0}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tabs button{flex:1;min-width:120px}
+.tabs button.active{background:linear-gradient(135deg,#b52d4d,#68142d);border-color:#df6c83}
+.notice{padding:12px 14px;border-left:3px solid var(--gold);background:#211a1b;color:#e3d6d5;margin:12px 0;font-size:16px}
+.notice.error{border-color:var(--danger)}.notice.success{border-color:var(--ok)}
+.item,.person,.exchange,.assignment{border:1px solid #393034;background:#100d10;padding:12px;margin:9px 0;border-radius:3px}
+.item-title{font-size:21px;color:#f0dfe2}
+.item a{color:#df8296;overflow-wrap:anywhere}
+.pill{display:inline-block;padding:3px 8px;border:1px solid #61404a;color:#dca4b0;font-size:12px;margin-left:5px}
+hr{border:0;border-top:1px solid var(--line);margin:18px 0}
+.hidden{display:none!important}
+.center{text-align:center}
+.big-pin{font-family:'Cinzel',serif;font-size:35px;letter-spacing:8px;color:#f0c1ca;text-align:center;padding:12px}
+footer{text-align:center;color:#897b80;font-size:14px;margin-top:35px}
+a{color:#e08ba0}
+#toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#21191d;border:1px solid #75404c;padding:10px 18px;z-index:20;max-width:90%;display:none}
+@media(max-width:560px){main{width:min(100% - 18px,760px);padding-top:20px}.card{padding:16px}.row{display:block}.row>*{margin-top:8px}.actions button{flex:1}}
+</style>
+</head>
+<body>
+<main>
+<header>
+  <div class="brand">Amigo Secreto</div>
+  <div class="subtitle">Un intercambio, un secreto, una sorpresa</div>
+</header>
+
+<section id="landing" class="card">
+  <h2 class="center">Bienvenido al intercambio</h2>
+  <p class="center muted">Elige cómo deseas continuar.</p>
+  <div class="tabs">
+    <button id="tabParticipant" class="active" onclick="showMode('participant')">Participante</button>
+    <button id="tabAdmin" onclick="showMode('admin')">Organizador</button>
+  </div>
+  <div id="participantLogin">
+    <label>Intercambio</label>
+    <div id="exchangeLabel" class="notice hidden"></div>
+    <div id="exchangeIdWrap"><input id="exchangeId" placeholder="Código del intercambio"></div>
+    <label>Tu nombre</label>
+    <select id="participantName"><option value="">Primero carga el intercambio</option></select>
+    <label>PIN de 4 dígitos</label>
+    <input id="participantPin" inputmode="numeric" maxlength="4" placeholder="••••">
+    <div class="actions"><button onclick="participantLogin()">Entrar</button><button class="secondary" onclick="loadParticipants()">Cargar participantes</button></div>
+    <div id="participantMsg"></div>
+  </div>
+  <div id="adminLogin" class="hidden">
+    <label>Correo del organizador</label><input id="adminEmail" type="email" autocomplete="username">
+    <label>Contraseña</label><input id="adminPassword" type="password" autocomplete="current-password">
+    <div class="actions"><button onclick="adminLogin()">Iniciar sesión</button></div>
+    <div id="adminMsg"></div>
+  </div>
+</section>
+
+<section id="adminApp" class="hidden">
+  <div class="card">
+    <div class="row"><div><h2>Panel del organizador</h2><div class="muted small" id="adminEmailLabel"></div></div><button class="secondary" onclick="signOut()">Cerrar sesión</button></div>
+    <div class="tabs">
+      <button id="adminTabExchanges" class="active" onclick="adminTab('exchanges')">Intercambios</button>
+      <button id="adminTabCreate" onclick="adminTab('create')">Crear nuevo</button>
+    </div>
+    <div id="adminExchanges">
+      <div id="exchangeList"></div>
+      <div id="adminExchangeDetail" class="hidden"></div>
+    </div>
+    <div id="adminCreate" class="hidden">
+      <h3>Nuevo intercambio</h3>
+      <label>Nombre del evento</label><input id="newExchangeName" placeholder="Ej. Intercambio de Navidad">
+      <div class="row"><div><label>Fecha</label><input id="newExchangeDate" type="date"></div><div><label>Presupuesto</label><input id="newExchangeBudget" type="number" min="0" step="0.01" placeholder="20"></div></div>
+      <label>Moneda</label><select id="newExchangeCurrency"><option value="USD">USD — Dólares</option><option value="EUR">EUR — Euros</option><option value="MXN">MXN — Pesos mexicanos</option><option value="VES">VES — Bolívares</option></select>
+      <div class="actions"><button onclick="createExchange()">Crear intercambio</button></div>
+    </div>
+  </div>
+</section>
+
+<section id="participantApp" class="hidden">
+  <div class="card">
+    <div class="row"><div><h2 id="participantWelcome">Tu intercambio</h2><div class="muted small" id="participantEvent"></div></div><button class="secondary" onclick="signOut()">Salir</button></div>
+    <div id="recipientPanel" class="notice hidden"></div>
+    <h3>Mi lista de deseos</h3>
+    <label>Notas para quien te regala</label><textarea id="myNotes" placeholder="Tallas, colores favoritos, ideas generales..."></textarea>
+    <div id="myItems"></div>
+    <div class="actions"><button class="secondary" onclick="addWishlistItem()">Añadir artículo</button><button onclick="saveWishlist()">Guardar mi lista</button></div>
+    <hr>
+    <h3>Lista de deseos de mi amigo secreto</h3>
+    <div id="recipientWishlist" class="muted">Cargando...</div>
+  </div>
+</section>
+<footer>Que el secreto sea parte de la magia.</footer>
+</main>
+<div id="toast"></div>
+
 <script>
-const app=document.getElementById('app'),tabsEl=document.getElementById('tabs');
-const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
-const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const head=(t)=>`<h1>${t}</h1><div class="orn"></div>`;
-function info(d){
-  const e=d.e||{};
-  const f=e.d?new Date(e.d+'T00:00').toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'';
-  const rows=[f&&'<b class="k">Fecha</b> · '+esc(f),e.m&&'<b class="k">Monto</b> · '+esc(e.m)].filter(Boolean);
-  return rows.length?'<div class="card">'+rows.join('<br>')+'</div>':'';
+const SUPABASE_URL = "https://ikwgscmcbbmcvpwnnxni.supabase.co";
+const SUPABASE_KEY = "sb_publishable_q_MakpsY3XJQ4Jjq6oMPyw_Y799Xl2t";
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+let currentExchange=null, currentAdminData=null, participantData=null, realtimeChannels=[];
+const $ = id => document.getElementById(id);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+function toast(msg){const t=$("toast");t.textContent=msg;t.style.display="block";setTimeout(()=>t.style.display="none",3200)}
+function message(id,msg,type=""){ $(id).innerHTML=msg?`<div class="notice ${type}">${esc(msg)}</div>`:""; }
+function fmtDate(v){if(!v)return "Fecha por definir";const d=new Date(v+"T00:00:00");return d.toLocaleDateString("es-ES",{day:"numeric",month:"long",year:"numeric"})}
+function money(v,c="USD"){if(v===null||v===undefined||v==="")return "Sin presupuesto";try{return new Intl.NumberFormat("es-ES",{style:"currency",currency:c}).format(Number(v))}catch{return `${v} ${c}`}}
+async function invoke(name,body={}){const {data,error}=await sb.functions.invoke(name,{body});if(error){let detail=error.message||"Error de conexión";try{const c=error.context;if(c&&typeof c.json==="function"){const j=await c.json();detail=j.error||j.message||detail}}catch{}throw new Error(detail)}if(data?.error)throw new Error(data.error);return data}
+function showMode(mode){$("participantLogin").classList.toggle("hidden",mode!=="participant");$("adminLogin").classList.toggle("hidden",mode!=="admin");$("tabParticipant").classList.toggle("active",mode==="participant");$("tabAdmin").classList.toggle("active",mode==="admin")}
+function showSection(which){$("landing").classList.toggle("hidden",which!=="landing");$("adminApp").classList.toggle("hidden",which!=="admin");$("participantApp").classList.toggle("hidden",which!=="participant")}
+function exchangeFromUrl(){const id=new URLSearchParams(location.search).get("exchange");if(id){$("exchangeId").value=id;$("exchangeIdWrap").classList.add("hidden");$("exchangeLabel").textContent="Intercambio identificado desde tu invitación";$("exchangeLabel").classList.remove("hidden");loadParticipants()}}
+async function loadParticipants(){
+ const id=$("exchangeId").value.trim();if(!id){message("participantMsg","Introduce el código del intercambio.");return}
+ try{const d=await invoke("list-exchange-participants",{exchange_id:id});currentExchange=d.exchange||d;const list=d.participants||[];$("participantName").innerHTML='<option value="">Selecciona tu nombre</option>'+list.map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join("");message("participantMsg",list.length?`Intercambio: ${currentExchange.name||"Amigo secreto"} · ${list.length} participantes`:"Todavía no hay participantes.","success")}
+ catch(e){message("participantMsg",e.message,"error")}
 }
-const enc=new TextEncoder(),dec=new TextDecoder();
-const b64=b=>btoa(String.fromCharCode(...new Uint8Array(b)));
-const ub=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
-async function key(pin,salt){
-  const m=await crypto.subtle.importKey('raw',enc.encode(pin),'PBKDF2',false,['deriveKey']);
-  return crypto.subtle.deriveKey({name:'PBKDF2',salt,iterations:150000,hash:'SHA-256'},m,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+async function participantLogin(){
+ try{const exchange_id=$("exchangeId").value.trim(),name=$("participantName").value,pin=$("participantPin").value.trim();if(!exchange_id||!name||!/^\d{4}$/.test(pin))throw new Error("Completa el intercambio, tu nombre y el PIN de 4 dígitos.");
+ let {data:sessionData}=await sb.auth.getSession();if(!sessionData.session){const {error}=await sb.auth.signInAnonymously();if(error)throw error}
+ const d=await invoke("participant-login",{exchange_id,name,pin});participantData=d;currentExchange=currentExchange||{};await loadMyWishlists();showSection("participant");subscribeRealtime();toast("Sesión iniciada")}
+ catch(e){message("participantMsg",e.message,"error")}
 }
-async function seal(pin,text){
-  const salt=crypto.getRandomValues(new Uint8Array(16)),iv=crypto.getRandomValues(new Uint8Array(12));
-  const c=await crypto.subtle.encrypt({name:'AES-GCM',iv},await key(pin,salt),enc.encode(text));
-  return{n:'',s:b64(salt),i:b64(iv),c:b64(c)};
+function getWishlistPayload(d){
+ const root=d?.data||d||{};
+ const mine=root.my_wishlist||root.myWishlist||root.own_wishlist||root.ownWishlist||root.wishlist||root.mine||{};
+ const theirs=root.recipient_wishlist||root.recipientWishlist||root.assigned_wishlist||root.assignedWishlist||root.target_wishlist||root.theirs||{};
+ const recipient=root.recipient||root.assigned_to||root.assignedTo||root.gift_recipient||{};
+ return {root,mine,theirs,recipient};
 }
-async function unseal(pin,e){return dec.decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:ub(e.i)},await key(pin,ub(e.s)),ub(e.c)));}
-
-let DATA=null,DRAWN=null;
-const ORG=new URLSearchParams(location.search).has('organizador');
-
-/* ---------- Participantes ---------- */
-function viewList(d){
-  const t=(d.e&&d.e.t)?esc(d.e.t):'Amigo secreto';
-  app.innerHTML=head(t)+`<p class="s">Toca tu nombre para ver a quién te tocó.</p>${info(d)}`;
-  d.p.forEach(e=>{const b=document.createElement('button');b.className='btn';b.textContent=cap(e.n);b.onclick=()=>viewPin(e,d);app.appendChild(b);});
+async function loadMyWishlists(){
+ const d=await invoke("get-my-wishlists",{});const x=getWishlistPayload(d);
+ participantData={...(participantData||{}),...x.root};
+ const mine=x.mine||{};$("myNotes").value=mine.notes||mine.wishlist?.notes||"";
+ renderMyItems(mine.items||mine.wishlist_items||[]);
+ const recipientName=x.recipient.name||x.recipient.participant_name||x.theirs.participant_name||x.theirs.name||"tu amigo secreto";
+ $("recipientPanel").textContent=`Te ha tocado: ${recipientName}`;$("recipientPanel").classList.remove("hidden");
+ $("participantWelcome").textContent=participantData.participant?.name?`Hola, ${participantData.participant.name}`:"Tu intercambio";
+ $("participantEvent").textContent=currentExchange?.name||participantData.exchange?.name||"";
+ renderRecipientWishlist(x.theirs);
 }
-function viewPin(e,d){
-  app.innerHTML=head('Hola, '+esc(cap(e.n)))+`<p class="s">Escribe tu clave de 4 dígitos.</p>
-  <div class="card"><input class="pin" id="pin" type="password" inputmode="numeric" maxlength="4" autocomplete="off"><div class="err" id="err"></div></div>
-  <button class="btn p" id="go">Ver mi amigo secreto</button><button class="btn" id="back">Volver</button>`;
-  const go=async()=>{
-    const pin=document.getElementById('pin').value,err=document.getElementById('err');
-    if(!/^\d{4}$/.test(pin)){err.textContent='La clave tiene 4 dígitos.';return;}
-    err.textContent='Verificando…';
-    try{viewResult(e.n,await unseal(pin,e),d);}catch(_){err.textContent='Clave incorrecta.';}
-  };
-  document.getElementById('go').onclick=go;
-  document.getElementById('pin').onkeydown=k=>{if(k.key==='Enter')go();};
-  document.getElementById('back').onclick=()=>viewList(d);
+function renderMyItems(items){$("myItems").innerHTML=(items||[]).map((it,i)=>itemEditor(it,i)).join("");}
+function itemEditor(it={},i){return `<div class="item wishlist-edit"><label>Artículo ${i+1}</label><input class="it-title" placeholder="Nombre del artículo" value="${esc(it.title||"")}"><input class="it-description" placeholder="Descripción, talla, color..." value="${esc(it.description||"")}"><input class="it-url" placeholder="Enlace (opcional)" value="${esc(it.url||"")}"><div class="actions"><button class="danger" onclick="this.closest('.wishlist-edit').remove()">Quitar</button></div></div>`}
+function addWishlistItem(){const wrap=document.createElement("div");wrap.innerHTML=itemEditor({},$("myItems").children.length);$("myItems").append(wrap.firstElementChild)}
+async function saveWishlist(){
+ try{const items=[...$("myItems").querySelectorAll(".wishlist-edit")].map(el=>({title:el.querySelector(".it-title").value.trim(),description:el.querySelector(".it-description").value.trim(),url:el.querySelector(".it-url").value.trim()})).filter(x=>x.title);
+ await invoke("save-my-wishlist",{notes:$("myNotes").value,items});toast("Tu lista se guardó correctamente");}
+ catch(e){toast(e.message)}
 }
-function viewResult(n,r,d){
-  app.innerHTML=head(esc(cap(n))+', tu amigo secreto es')+`<div class="card"><div class="big">${esc(cap(r))}</div></div>${info(d)}
-  <p class="s">Guarda el secreto. Al cerrar esta pantalla tendrás que volver a ingresar tu clave.</p><button class="btn" id="back">Cerrar</button>`;
-  document.getElementById('back').onclick=()=>viewList(d);
+function renderRecipientWishlist(w){
+ const items=w?.items||w?.wishlist_items||[];let out="";
+ if(w?.notes)out+=`<p>${esc(w.notes)}</p>`;
+ if(items.length)out+=items.map(it=>`<div class="item"><div class="item-title">${esc(it.title)}</div>${it.description?`<p>${esc(it.description)}</p>`:""}${it.url?`<a href="${esc(it.url)}" target="_blank" rel="noopener">Ver artículo ↗</a>`:""}</div>`).join("");
+ $("recipientWishlist").innerHTML=out||'<p class="muted">Tu amigo secreto todavía no ha añadido artículos a su lista.</p>';
 }
-
-/* ---------- Organizador ---------- */
-function setup(){
-  const aviso=DATA?'<p class="s">Ya hay un sorteo publicado en esta página. Si subes uno nuevo, lo reemplazas.</p>':'<p class="s">El sorteo se hace en tu navegador y queda cifrado: nadie ve quién le tocó a quién.</p>';
-  app.innerHTML=head('Organizador')+aviso+`
-  <div class="card"><label for="et">Nombre del evento (opcional)</label>
-  <input id="et" maxlength="60" placeholder="Intercambio de Navidad">
-  <label for="ed">Fecha (opcional)</label><input id="ed" type="date">
-  <label for="em">Monto del regalo (opcional)</label>
-  <input id="em" maxlength="40" placeholder="$20 USD">
-  <label for="nm">Participantes (uno por línea)</label>
-  <textarea id="nm" rows="6">miguel\nisa\nrafa\njuancho\nbeto</textarea>
-  <label for="rs">Restricciones (quien: no puede darle a…)</label>
-  <textarea id="rs" rows="6">isa: beto, juancho\njuancho: isa\nbeto: miguel\nrafa: juancho\nmiguel: rafa</textarea>
-  <div class="err" id="err"></div></div>
-  <button class="btn p" id="go">Sortear</button><div id="out"></div>`;
-  document.getElementById('go').onclick=run;
+async function adminLogin(){
+ try{const {data,error}=await sb.auth.signInWithPassword({email:$("adminEmail").value.trim(),password:$("adminPassword").value});if(error)throw error;$("adminEmailLabel").textContent=data.user.email;await loadExchanges();showSection("admin");}
+ catch(e){message("adminMsg",e.message,"error")}
 }
-function draw(people,ban){
-  for(let t=0;t<20000;t++){
-    const r=people.slice();
-    for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}
-    if(people.every((d,i)=>d!==r[i]&&!(ban[d]||[]).includes(r[i])))return Object.fromEntries(people.map((d,i)=>[d,r[i]]));
-  }
-  return null;
+async function signOut(){realtimeChannels.forEach(c=>sb.removeChannel(c));realtimeChannels=[];await sb.auth.signOut();currentExchange=null;participantData=null;currentAdminData=null;showSection("landing");}
+function adminTab(tab){$("adminExchanges").classList.toggle("hidden",tab!=="exchanges");$("adminCreate").classList.toggle("hidden",tab!=="create");$("adminTabExchanges").classList.toggle("active",tab==="exchanges");$("adminTabCreate").classList.toggle("active",tab==="create")}
+async function loadExchanges(){try{const d=await invoke("admin-list-exchanges",{});const list=d.exchanges||d||[];$("exchangeList").innerHTML=list.length?list.map(ex=>`<div class="exchange"><h3>${esc(ex.name)}</h3><div class="muted">${fmtDate(ex.event_date)} · ${money(ex.budget,ex.currency)} · ${esc(ex.status)}</div><div class="actions"><button onclick="openExchange('${ex.id}')">Administrar</button><button class="secondary" onclick="copyInvite('${ex.id}')">Copiar invitación</button></div></div>`).join(""):'<p class="muted">Todavía no has creado intercambios.</p>'}catch(e){$("exchangeList").innerHTML=`<div class="notice error">${esc(e.message)}</div>`}}
+async function createExchange(){
+ try{const name=$("newExchangeName").value.trim();if(!name)throw new Error("Escribe el nombre del intercambio.");const d=await invoke("create-exchange",{name,event_date:$("newExchangeDate").value||null,budget:$("newExchangeBudget").value||null,currency:$("newExchangeCurrency").value});toast("Intercambio creado");$("newExchangeName").value="";await loadExchanges();const ex=d.exchange||d; if(ex.id)await openExchange(ex.id);adminTab("exchanges")}
+ catch(e){toast(e.message)}
 }
-async function copy(text,btn,ta){
-  try{await navigator.clipboard.writeText(text);}catch(_){ta.select();document.execCommand('copy');}
-  btn.textContent='Copiado';
+function copyInvite(id){const u=new URL(location.href);u.searchParams.set("exchange",id);navigator.clipboard.writeText(u.toString()).then(()=>toast("Enlace de invitación copiado")).catch(()=>prompt("Copia este enlace:",u.toString()))}
+async function openExchange(id){
+ try{const d=await invoke("admin-get-exchange",{exchange_id:id});currentAdminData=d;currentExchange=d.exchange;$("adminExchangeDetail").classList.remove("hidden");renderAdminDetail(d)}
+ catch(e){toast(e.message)}
 }
-async function run(){
-  const err=document.getElementById('err');err.textContent='';
-  const people=[...new Set(document.getElementById('nm').value.split('\n').map(s=>s.trim().toLowerCase()).filter(Boolean))];
-  if(people.length<3){err.textContent='Se necesitan al menos 3 participantes.';return;}
-  const ban={};
-  for(const line of document.getElementById('rs').value.split('\n')){
-    if(!line.trim())continue;
-    const [a,b]=line.split(':');
-    const d=(a||'').trim().toLowerCase(),xs=(b||'').split(',').map(s=>s.trim().toLowerCase()).filter(Boolean);
-    const bad=[d,...xs].find(n=>!people.includes(n));
-    if(bad){err.textContent=`"${bad}" no está en la lista de participantes.`;return;}
-    ban[d]=[...(ban[d]||[]),...xs];
-  }
-  const res=draw(people,ban);
-  if(!res){err.textContent='No hay combinación posible con esas restricciones.';return;}
-  const used=new Set(),pins={};
-  people.forEach(n=>{let p;do{p=String(Math.floor(Math.random()*10000)).padStart(4,'0');}while(used.has(p));used.add(p);pins[n]=p;});
-  const p=[];
-  for(const n of people){const e=await seal(pins[n],res[n]);e.n=n;p.push(e);}
-  const e={};
-  const t=document.getElementById('et').value.trim(),dd=document.getElementById('ed').value,m=document.getElementById('em').value.trim();
-  if(t)e.t=t;if(dd)e.d=dd;if(m)e.m=m;
-  DRAWN=Object.keys(e).length?{e,p}:{p};
-  const json=JSON.stringify(DRAWN);
-  const base=location.href.split(/[?#]/)[0];
-  const link=location.protocol==='file:'?'(publica primero la página para tener su link)':base;
-  document.getElementById('out').innerHTML=`<div class="card"><b class="k">Claves: anótalas ahora, no se pueden recuperar</b>
-  <table>${people.map(n=>`<tr><td>${esc(cap(n))}</td><td>${pins[n]}</td></tr>`).join('')}</table></div>
-  <div class="card"><b class="k">Publicar el sorteo</b>
-  <p class="s" style="text-align:left;margin:8px 0">1. Descarga el archivo. 2. Súbelo a tu repositorio de GitHub con el nombre exacto <b>datos.json</b> (reemplaza el anterior si existe). 3. Espera uno o dos minutos.</p>
-  <button class="btn p" id="dl">Descargar datos.json</button>
-  <details><summary>Si la descarga no funciona, copia el contenido</summary>
-  <textarea id="jt" rows="4" readonly></textarea><button class="btn" id="cj">Copiar contenido</button></details></div>
-  <div class="card"><b class="k">Link para tus amigos</b><div class="lk" id="lt"></div>
-  <button class="btn" id="cl">Copiar link</button></div>`;
-  document.getElementById('lt').textContent=link;
-  const jt=document.getElementById('jt');jt.value=json;
-  document.getElementById('dl').onclick=()=>{
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));a.download='datos.json';
-    document.body.appendChild(a);a.click();a.remove();
-  };
-  document.getElementById('cj').onclick=ev=>copy(json,ev.target,jt);
-  const tmp=document.createElement('textarea');tmp.value=base;tmp.setAttribute('aria-hidden','true');tmp.style.cssText='position:fixed;left:-9999px;top:0;width:1px;height:1px;opacity:0';document.body.appendChild(tmp);
-  document.getElementById('cl').onclick=ev=>copy(base,ev.target,tmp);
+function renderAdminDetail(d){
+ const ex=d.exchange,ps=d.participants||[],as=d.assignments||[],xs=d.exclusions||[],ws=d.wishlists||[];
+ const drawn=ex.status==="drawn";
+ let html=`<hr><h2>${esc(ex.name)}</h2><p class="muted">${fmtDate(ex.event_date)} · ${money(ex.budget,ex.currency)} · ${ps.length} participantes</p>
+ <div class="actions"><button class="secondary" onclick="copyInvite('${ex.id}')">Copiar enlace para participantes</button></div>
+ <h3>Participantes</h3>`;
+ if(!drawn)html+=`<label>Añadir participantes (uno por línea)</label><textarea id="newParticipantNames" placeholder="Ana&#10;Luis&#10;María"></textarea><div class="actions"><button onclick="addParticipants()">Añadir y generar PIN</button></div>`;
+ html+=ps.map(p=>`<div class="person"><strong>${esc(p.name)}</strong>${!drawn?` <button class="danger" onclick="removeParticipant('${p.id}')">Eliminar</button>`:""}</div>`).join("")||'<p class="muted">No hay participantes todavía.</p>';
+ if(!drawn){
+ html+=`<h3>Restricciones</h3><p class="small muted">Indica quién NO puede regalarle a quién.</p><div class="row"><div><label>Quien regala</label><select id="excludeGiver">${ps.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></div><div><label>Quien recibe</label><select id="excludeRecipient">${ps.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("")}</select></div></div><div class="actions"><button class="secondary" onclick="addExclusion()">Añadir restricción</button></div>`;
+ html+=xs.map(x=>{const a=ps.find(p=>p.id===x.giver_id),b=ps.find(p=>p.id===x.recipient_id);return `<div class="person">${esc(a?.name||"Participante")} no puede regalarle a ${esc(b?.name||"participante")} <button class="danger" onclick="removeExclusion('${x.giver_id}','${x.recipient_id}')">Quitar</button></div>`}).join("");
+ html+=`<div class="actions"><button onclick="runDraw('${ex.id}')">Realizar sorteo</button></div>`;
+ }else{
+ html+=`<h3>Asignaciones</h3>`+as.map(a=>{const giver=ps.find(p=>p.id===a.giver_id),rec=ps.find(p=>p.id===a.recipient_id);return `<div class="assignment">${esc(giver?.name||"")} <span class="pill">regala a</span> ${esc(rec?.name||"")}</div>`}).join("");
+ }
+ html+=`<h3>Listas de deseos</h3><p class="small muted">Vista del organizador.</p>`+ws.map(w=>{const p=ps.find(p=>p.id===w.participant_id);const its=w.items||[];return `<div class="person"><strong>${esc(p?.name||w.participant_name||"Participante")}</strong><p>${esc(w.notes||"")}</p>${its.map(it=>`<div class="small">• ${esc(it.title)} ${it.description?`— ${esc(it.description)}`:""} ${it.url?`<a target="_blank" rel="noopener" href="${esc(it.url)}">Enlace</a>`:""}</div>`).join("")||'<span class="small muted">Sin artículos todavía.</span>'}</div>`}).join("")||'<p class="muted">Aún no hay listas.</p>';
+ $("adminExchangeDetail").innerHTML=html;
 }
-
-/* ---------- Pestañas (solo organizador) ---------- */
-function tab(which){
-  tabsEl.innerHTML=`<div class="tabs"><button class="btn ${which==='o'?'p':''}" id="t1">Organizador</button><button class="btn ${which==='p'?'p':''}" id="t2">Vista previa</button></div>`;
-  document.getElementById('t1').onclick=()=>{tab('o');setup();};
-  document.getElementById('t2').onclick=()=>{
-    tab('p');
-    const d=DRAWN||DATA;
-    d?viewList(d):app.innerHTML='<p class="s">Primero haz el sorteo en la pestaña Organizador.</p>';
-  };
+async function addParticipants(){
+ try{const names=$("newParticipantNames").value.split(/\n|,/).map(x=>x.trim()).filter(Boolean);if(!names.length)throw new Error("Escribe al menos un nombre.");const d=await invoke("create-participants",{exchange_id:currentExchange.id,participants:names});const creds=d.participants||d.credentials||d.created||[];let lines=creds.map(p=>`${p.name}: ${p.pin||p.PIN||p.code||""}`).join("\n");if(!lines&&Array.isArray(d.pins))lines=d.pins.map(p=>`${p.name}: ${p.pin}`).join("\n");alert("GUARDA ESTOS PIN. Solo se muestran ahora.\n\n"+(lines||JSON.stringify(d,null,2)));await openExchange(currentExchange.id)}
+ catch(e){toast(e.message)}
 }
-
-/* ---------- Inicio ---------- */
-(async()=>{
-  try{
-    const r=await fetch('datos.json?v='+Date.now(),{cache:'no-store'});
-    if(r.ok){const j=await r.json();if(j&&Array.isArray(j.p)&&j.p.length)DATA=j;}
-  }catch(_){}
-  if(DATA&&!ORG)viewList(DATA);else{tab('o');setup();}
-})();
-</script></body></html>
+async function removeParticipant(id){if(!confirm("¿Eliminar este participante?"))return;try{await invoke("remove-exchange-participant",{exchange_id:currentExchange.id,participant_id:id});await openExchange(currentExchange.id);toast("Participante eliminado")}catch(e){toast(e.message)}}
+async function addExclusion(){try{await invoke("manage-exchange-exclusions",{action:"add",exchange_id:currentExchange.id,giver_id:$("excludeGiver").value,recipient_id:$("excludeRecipient").value});await openExchange(currentExchange.id)}catch(e){toast(e.message)}}
+async function removeExclusion(giver_id,recipient_id){try{await invoke("manage-exchange-exclusions",{action:"remove",exchange_id:currentExchange.id,giver_id,recipient_id});await openExchange(currentExchange.id)}catch(e){toast(e.message)}}
+async function runDraw(id){if(!confirm("¿Realizar el sorteo? Esta acción no se puede deshacer."))return;try{const d=await invoke("draw-exchange",{exchange_id:id});toast(`Sorteo realizado: ${d.count||d.assignments_count||"listo"} asignaciones`);await openExchange(id)}catch(e){toast(e.message)}}
+function subscribeRealtime(){
+ realtimeChannels.forEach(c=>sb.removeChannel(c));realtimeChannels=[];
+ const ch=sb.channel("participant-wishlist-live").on("postgres_changes",{event:"*",schema:"public",table:"wishlists"},()=>loadMyWishlists().catch(()=>{})).on("postgres_changes",{event:"*",schema:"public",table:"wishlist_items"},()=>loadMyWishlists().catch(()=>{})).subscribe();realtimeChannels.push(ch);
+}
+async function restoreSession(){
+ const {data}=await sb.auth.getSession();if(!data.session)return;
+ const user=data.session.user;
+ try{const {data:admin}=await sb.from("admin_users").select("user_id").eq("user_id",user.id).maybeSingle();if(admin){$("adminEmailLabel").textContent=user.email||"Organizador";await loadExchanges();showSection("admin");return}}
+ catch{}
+ // Anonymous sessions are deliberately not resumed into a participant view without revalidating the server mapping.
+}
+window.addEventListener("load",()=>{exchangeFromUrl();restoreSession()});
+</script>
+</body>
+</html>
