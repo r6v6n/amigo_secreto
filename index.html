@@ -227,12 +227,6 @@ a{color:#e08ba0}
 
     <h3>Mi lista de deseos</h3>
 
-<div id="myItems"></div>
-
-<div class="actions">
-  <button class="secondary" onclick="addWishlistItem()">Añadir artículo</button>
-  <button onclick="saveWishlist()">Guardar mi lista</button>
-</div>
 
 <hr>
 
@@ -429,6 +423,31 @@ function renderRecipientWishlist(w){
  }
 
  $("recipientWishlist").innerHTML=out||'<p class="muted">Tu amigo secreto todavía no ha añadido artículos a su lista.</p>';
+}
+async function loadExchanges(){
+  try{
+    const d=await invoke("admin-list-exchanges",{});
+    const list=d.exchanges||d||[];
+
+    $("exchangeList").innerHTML=list.length
+      ?list.map(ex=>`
+        <div class="exchange">
+          <h3>${esc(ex.name)}</h3>
+          <div class="muted">
+            ${fmtDate(ex.event_date)} · ${money(ex.budget,ex.currency)} · ${esc(ex.status)}
+          </div>
+          <div class="actions">
+            <button onclick="openExchange('${ex.id}')">Administrar</button>
+            <button class="secondary" onclick="copyInvite('${ex.id}')">Copiar invitación</button>
+          </div>
+        </div>
+      `).join("")
+      :'<p class="muted">Todavía no has creado intercambios.</p>';
+
+  }catch(e){
+    $("exchangeList").innerHTML=
+      `<div class="notice error">${esc(e.message)}</div>`;
+  }
 }
 async function adminLogin(){
  try{const {data,error}=await sb.auth.signInWithPassword({email:$("adminEmail").value.trim(),password:$("adminPassword").value});if(error)throw error;$("adminEmailLabel").textContent=data.user.email;await loadExchanges();showSection("admin");}
