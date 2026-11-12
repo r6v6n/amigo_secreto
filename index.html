@@ -57,6 +57,59 @@ footer{text-align:center;color:#897b80;font-size:14px;margin-top:35px}
 a{color:#e08ba0}
 #toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#21191d;border:1px solid #75404c;padding:10px 18px;z-index:20;max-width:90%;display:none}
 @media(max-width:560px){main{width:min(100% - 18px,760px);padding-top:20px}.card{padding:16px}.row{display:block}.row>*{margin-top:8px}.actions button{flex:1}}
+.recipient-wishlist-section{
+  margin:18px 0 24px;
+  padding:20px;
+  background:rgba(75,18,35,.30);
+  border:1px solid #84203d;
+  border-radius:5px;
+  box-shadow:0 0 18px rgba(132,32,61,.16);
+}
+
+.recipient-wishlist-section h3{
+  color:#f0c1ca;
+  font-size:25px;
+  text-align:center;
+  margin:0 0 18px;
+  padding-bottom:13px;
+  border-bottom:1px solid #84203d;
+}
+
+#recipientWishlist{
+  color:#eadde0;
+  font-size:16px;
+  line-height:1.6;
+}
+
+#recipientWishlist>p{
+  color:#f0dfe2;
+  font-size:17px;
+}
+
+#recipientWishlist .item{
+  background:#211319;
+  border:1px solid #75404c;
+  border-left:4px solid #a94a62;
+  padding:16px;
+  margin:12px 0;
+  border-radius:4px;
+}
+
+#recipientWishlist .item-title{
+  color:#f5cbd4;
+  font-size:23px;
+  margin-bottom:6px;
+}
+
+#recipientWishlist .item p{
+  color:#e3d6d5;
+  font-size:16px;
+}
+
+#recipientWishlist .item a{
+  color:#f0a3b5;
+  font-weight:600;
+}
 </style>
 </head>
 <body>
@@ -126,14 +179,26 @@ a{color:#e08ba0}
 
     <div id="recipientPanel" class="notice hidden"></div>
 
-    <h3>Lista de deseos de mi amigo secreto</h3>
-    <div id="recipientWishlist" class="muted">Cargando...</div>
+    <div class="recipient-wishlist-section">
+  <h3>Lista de deseos de mi amigo secreto</h3>
+  <div id="recipientWishlist">Cargando...</div>
+</div>
 
     <hr>
 
     <h3>Mi lista de deseos</h3>
-    <label>Notas para quien te regala</label>
-    <textarea id="myNotes" placeholder="Tallas, colores favoritos, ideas generales..."></textarea>
+
+<div id="myItems"></div>
+
+<div class="actions">
+  <button class="secondary" onclick="addWishlistItem()">Añadir artículo</button>
+  <button onclick="saveWishlist()">Guardar mi lista</button>
+</div>
+
+<hr>
+
+<label>Notas para quien te regala</label>
+<textarea id="myNotes" placeholder="Tallas, colores favoritos, ideas generales..."></textarea>
 
     <div id="myItems"></div>
 
@@ -295,7 +360,10 @@ async function loadMyWishlists(){
  renderRecipientWishlist(x.theirs);
 }
 
-function renderMyItems(items){$("myItems").innerHTML=(items||[]).map((it,i)=>itemEditor(it,i)).join("");}
+function renderMyItems(items){
+  const list=(items&&items.length)?items:[{}];
+  $("myItems").innerHTML=list.map((it,i)=>itemEditor(it,i)).join("");
+}
 function itemEditor(it={},i){return `<div class="item wishlist-edit"><label>Artículo ${i+1}</label><input class="it-title" placeholder="Nombre del artículo" value="${esc(it.title||"")}"><input class="it-description" placeholder="Descripción, talla, color..." value="${esc(it.description||"")}"><input class="it-url" placeholder="Enlace (opcional)" value="${esc(it.url||"")}"><div class="actions"><button class="danger" onclick="this.closest('.wishlist-edit').remove()">Quitar</button></div></div>`}
 function addWishlistItem(){const wrap=document.createElement("div");wrap.innerHTML=itemEditor({},$("myItems").children.length);$("myItems").append(wrap.firstElementChild)}
 async function saveWishlist(){
