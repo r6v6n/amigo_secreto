@@ -449,6 +449,39 @@ async function loadExchanges(){
       `<div class="notice error">${esc(e.message)}</div>`;
   }
 }
+async function createExchange(){
+  try{
+    const name=$("newExchangeName").value.trim();
+
+    if(!name){
+      throw new Error("Escribe el nombre del intercambio.");
+    }
+
+    const d=await invoke("create-exchange",{
+      name,
+      event_date:$("newExchangeDate").value||null,
+      budget:$("newExchangeBudget").value||null,
+      currency:$("newExchangeCurrency").value
+    });
+
+    toast("Intercambio creado");
+
+    $("newExchangeName").value="";
+
+    await loadExchanges();
+
+    const ex=d.exchange||d;
+
+    if(ex.id){
+      await openExchange(ex.id);
+    }
+
+    adminTab("exchanges");
+
+  }catch(e){
+    toast(e.message);
+  }
+}
 async function adminLogin(){
  try{const {data,error}=await sb.auth.signInWithPassword({email:$("adminEmail").value.trim(),password:$("adminPassword").value});if(error)throw error;$("adminEmailLabel").textContent=data.user.email;await loadExchanges();showSection("admin");}
  catch(e){message("adminMsg",e.message,"error")}
