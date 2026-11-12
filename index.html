@@ -449,6 +449,13 @@ async function loadExchanges(){
       `<div class="notice error">${esc(e.message)}</div>`;
   }
 }
+function adminTab(tab){
+  $("adminExchanges").classList.toggle("hidden",tab!=="exchanges");
+  $("adminCreate").classList.toggle("hidden",tab!=="create");
+
+  $("adminTabExchanges").classList.toggle("active",tab==="exchanges");
+  $("adminTabCreate").classList.toggle("active",tab==="create");
+}
 async function createExchange(){
   try{
     const name=$("newExchangeName").value.trim();
