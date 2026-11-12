@@ -115,6 +115,40 @@ a{color:#e08ba0}
   font-weight:700;
   text-decoration:underline;
 }
+.recipient-items-list{
+  padding-left:25px;
+  margin:12px 0;
+  list-style-type:disc;
+}
+
+.recipient-items-list li{
+  padding-left:5px;
+  margin:0 0 16px;
+  color:#f0dfe2;
+}
+
+.recipient-item-title{
+  color:#f0dfe2;
+  font-size:22px;
+  font-weight:700;
+  line-height:1.3;
+}
+
+.recipient-item-description{
+  color:#f0dfe2;
+  font-size:16px;
+  font-weight:400;
+  margin-top:3px;
+  line-height:1.5;
+}
+
+.recipient-items-list li a{
+  display:inline-block;
+  margin-top:4px;
+  color:#f0dfe2;
+  font-size:14px;
+  font-weight:600;
+}
 </style>
 </head>
 <body>
@@ -377,9 +411,23 @@ async function saveWishlist(){
  catch(e){toast(e.message)}
 }
 function renderRecipientWishlist(w){
- const items=w?.items||w?.wishlist_items||[];let out="";
+ const items=w?.items||w?.wishlist_items||[];
+ let out="";
+
  if(w?.notes)out+=`<p>${esc(w.notes)}</p>`;
- if(items.length)out+=items.map(it=>`<div class="item"><div class="item-title">${esc(it.title)}</div>${it.description?`<p>${esc(it.description)}</p>`:""}${it.url?`<a href="${esc(it.url)}" target="_blank" rel="noopener">Ver artículo ↗</a>`:""}</div>`).join("");
+
+ if(items.length){
+  out+=`<ul class="recipient-items-list">`;
+  out+=items.map(it=>`
+   <li>
+    <div class="recipient-item-title">${esc(it.title)}</div>
+    ${it.description?`<div class="recipient-item-description">${esc(it.description)}</div>`:""}
+    ${it.url?`<a href="${esc(it.url)}" target="_blank" rel="noopener">Ver artículo ↗</a>`:""}
+   </li>
+  `).join("");
+  out+=`</ul>`;
+ }
+
  $("recipientWishlist").innerHTML=out||'<p class="muted">Tu amigo secreto todavía no ha añadido artículos a su lista.</p>';
 }
 async function adminLogin(){
