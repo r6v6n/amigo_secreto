@@ -313,12 +313,13 @@ async function adminLogin(){
  try{const {data,error}=await sb.auth.signInWithPassword({email:$("adminEmail").value.trim(),password:$("adminPassword").value});if(error)throw error;$("adminEmailLabel").textContent=data.user.email;await loadExchanges();showSection("admin");}
  catch(e){message("adminMsg",e.message,"error")}
 }
-async function signOut(){realtimeChannels.forEach(c=>sb.removeChannel(c));realtimeChannels=[];await sb.auth.signOut();currentExchange=null;participantData=null;currentAdminData=null;showSection("landing");}
-function adminTab(tab){$("adminExchanges").classList.toggle("hidden",tab!=="exchanges");$("adminCreate").classList.toggle("hidden",tab!=="create");$("adminTabExchanges").classList.toggle("active",tab==="exchanges");$("adminTabCreate").classList.toggle("active",tab==="create")}
-async function loadExchanges(){try{const d=await invoke("admin-list-exchanges",{});const list=d.exchanges||d||[];$("exchangeList").innerHTML=list.length?list.map(ex=>`<div class="exchange"><h3>${esc(ex.name)}</h3><div class="muted">${fmtDate(ex.event_date)} · ${money(ex.budget,ex.currency)} · ${esc(ex.status)}</div><div class="actions"><button onclick="openExchange('${ex.id}')">Administrar</button><button class="secondary" onclick="copyInvite('${ex.id}')">Copiar invitación</button></div></div>`).join(""):'<p class="muted">Todavía no has creado intercambios.</p>'}catch(e){$("exchangeList").innerHTML=`<div class="notice error">${esc(e.message)}</div>`}}
-async function createExchange(){
- try{const name=$("newExchangeName").value.trim();if(!name)throw new Error("Escribe el nombre del intercambio.");const d=await invoke("create-exchange",{name,event_date:$("newExchangeDate").value||null,budget:$("newExchangeBudget").value||null,currency:$("newExchangeCurrency").value});toast("Intercambio creado");$("newExchangeName").value="";await loadExchanges();const ex=d.exchange||d; if(ex.id)await openExchange(ex.id);adminTab("exchanges")}
- catch(e){toast(e.message)}
+async function signOut(){
+ realtimeChannels.forEach(c=>sb.removeChannel(c));
+ realtimeChannels=[];
+ await sb.auth.signOut();
+ participantData=null;
+ currentAdminData=null;
+ showSection("landing");
 }
 function copyInvite(id){const u=new URL(location.href);u.searchParams.set("exchange",id);navigator.clipboard.writeText(u.toString()).then(()=>toast("Enlace de invitación copiado")).catch(()=>prompt("Copia este enlace:",u.toString()))}
 async function openExchange(id){
